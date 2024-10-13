@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPU Memory Calculator for LLMs</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .card {
+            max-width: 700px;
+            margin: 20px auto;
+        }
+        h5, h6, p {
+            margin-bottom: 15px;
+        }
+        #result {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .state-of-art, .example, .citation, footer {
+            background-color: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        @media (max-width: 768px) {
+            h1, h5 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <h1>GPU Memory Calculator for Large Language Models</h1>
+            <p class="lead">Estimate the required GPU memory based on model parameters and quantization.</p>
+        </div>
+
+        <!-- Calculator Card -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-center">Calculate GPU Memory Requirements</h5>
+                <p class="text-center">Input the model details below to estimate GPU memory.</p>
+                <form id="memory-form">
+                    <div class="mb-3">
+                        <label for="parameters" class="form-label">Number of Parameters (P in Billions)</label>
+                        <input type="number" class="form-control" id="parameters" placeholder="Enter number of parameters (e.g., 7 for 7B model)" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantization" class="form-label">Quantization (Q - Number of Bits)</label>
+                        <select class="form-select" id="quantization" required>
+                            <option value="4">4 bits (Most Efficient)</option>
+                            <option value="8">8 bits</option>
+                            <option value="16">16 bits (More Precision)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="overhead" class="form-label">Overhead Multiplier (Default: 1.2)</label>
+                        <input type="number" step="0.1" class="form-control" id="overhead" value="1.2">
+                    </div>
+                    <div class="text-center">
+                        <button type="button" class="btn btn-primary btn-lg" onclick="calculateMemory()">Calculate Memory</button>
+                    </div>
+                </form>
+                <hr>
+                <h5 class="text-center">Estimated GPU Memory: <span id="result">0</span> GB</h5>
+            </div>
+        </div>
+
+        <!-- Formula and Description Table -->
+        <div class="state-of-art mt-4">
+            <h6>Formula to Calculate GPU Memory:</h6>
+            <p>The formula for calculating GPU memory usage in Large Language Models (LLMs) is given by:</p>
+            <p class="text-center">
+                $$ M = \left( \frac{P \times 4B}{\frac{32}{Q}} \right) \times 1.2 $$
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>M</strong></td>
+                        <td>GPU memory required, expressed in Gigabytes (GB).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>P</strong></td>
+                        <td>Number of model parameters in billions (e.g., 7 for a 7B model).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>4B</strong></td>
+                        <td>Represents 4 bytes (used for each parameter).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>32</strong></td>
+                        <td>32 bits (in a 4-byte block).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Q</strong></td>
+                        <td>Quantization level (e.g., 16 bits, 8 bits, 4 bits).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>1.2</strong></td>
+                        <td>Represents the 20% overhead for additional factors.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Example Section -->
+        <div class="example mt-4">
+            <h6>Example: Calculating GPU Memory</h6>
+            <p>Consider an LLM with 6 billion parameters, and you plan to use 8-bit quantization with a default 20% overhead. The GPU memory can be calculated as follows:</p>
+            <p class="text-center">
+                $$ M = \left( \frac{6 \times 4B}{\frac{32}{8}} \right) \times 1.2 $$
+            </p>
+            <p>Calculation:</p>
+            <ul>
+                <li>Model Parameters, \( P = 6B \)</li>
+                <li>Quantization, \( Q = 8 \) bits</li>
+                <li>Overhead = 1.2</li>
+                <li>Result: <strong>M ≈ 3.60 GB</strong></li>
+            </ul>
+        </div>
+
+        <!-- State of the Art Section -->
+
+        <div class="state-of-art mt-4">
+            <h2 class="text-center">State-of-the-art Memory Optimization in LLMs</h2>
+            <div class="container">
+                <p>
+                    As large LLMs grow, optimizing their computational resource usage, particularly GPU memory, becomes increasingly pressing. These models contain billions of parameters, making them difficult to deploy on standard hardware configurations. To address these challenges, research has explored several memory optimization techniques that significantly reduce memory requirements without compromising performance.
+                </p>
+                
+                <h4>Quantization</h4>
+                <p>
+                    <strong>Quantization</strong> is a prominent technique used to reduce the precision of the model's parameters. Instead of storing parameters as 32-bit floating-point numbers, they can be represented with lower bit-widths, such as 16-bit, 8-bit, or even 4-bit integers. This approach reduces memory consumption, often by up to half or more, depending on the bit width used. For instance, 8-bit quantization halves the memory usage compared to 16-bit quantization, while 4-bit further reduces memory consumption.
+                </p>
+                <p>
+                    Quantization methods can be <strong>uniform</strong>, applying the same step size across all parameters, or <strong>non-uniform</strong>, which varies the step size to minimize errors in critical regions. Although early quantization approaches suffered from performance degradation, recent methods preserve accuracy more effectively, enabling resource-constrained GPUs to handle large models efficiently. A research published by <a href="https://ceur-ws.org/Vol-3780/paper3.pdf" target="_blank">Aggarwal et al. (2024) [1]</a> highlights how modern quantization techniques allow for minimal accuracy loss, even in large-scale models.
+                </p>
+
+                <h4>Model Sparsity</h4>
+                <p>
+                    <strong>Model sparsity</strong> is another crucial strategy. In this strategy, less significant model parameters are pruned or reduced, leading to a more memory-efficient model. Pruning can be structured, where entire groups (e.g., neurons or layers) are removed, or unstructured, where individual weights are zeroed out.
+                </p>
+                <p>
+                    Making the model sparse significantly reduces memory consumption without impacting the model's overall performance. When combined with quantization, this can yield <strong>sparse-quantized models</strong>, which further optimize resource usage while maintaining high performance across various natural language processing tasks. Literature suggests that the combination of sparsity and quantization is one of the most effective ways to scale models for resource-constrained hardware (see <a href="https://arxiv.org/html/2409.04833v1" target="_blank">Rostam et al. (2024) [2]</a>).
+                </p>
+
+                <h4>Mixed Precision Training</h4>
+                <p>
+                    <strong>Mixed precision training</strong> is a popular method that dynamically uses lower precision (e.g., 16-bit) for some calculations while retaining higher precision (e.g., 32-bit) for critical operations like gradient accumulation. This reduces memory usage and speeds up training without sacrificing model accuracy.
+                </p>
+                <p>
+                    Many modern GPUs, such as NVIDIA's Ampere architecture, are optimized for mixed precision training, and frameworks like PyTorch and TensorFlow have built-in support. This technique has been widely adopted in large-scale model training due to its significant memory savings without degrading performance (<a href="https://github.com/htqin/awesome-model-quantization/blob/master/README.md" target="_blank">GitHub [3]</a>).
+                </p>
+
+                <h4>Memory Offloading and Swapping</h4>
+                <p>
+                    Recent advancements also include techniques like memory offloading and GPU memory swapping. These methods offload less-used portions of the model to CPU memory or external storage (e.g., SSDs) and swap them in when needed. <strong>Activation recomputation</strong> is another related technique in which intermediate activations during backpropagation are recomputed rather than stored, saving memory during training.
+                </p>
+                <p>
+                    For example, a technique explored in the study by <a href="https://hal.science/hal-04660745/document" target="_blank">Zhao et al. (2024) [4]</a> enables the deployment of large models on GPUs with limited memory capacity by intelligently swapping portions of the model.
+                </p>
+                <hr>
+                <p>
+                    In conclusion, techniques like quantization, sparsity, mixed precision training, and memory offloading are all integral to making LLMs more accessible on hardware with limited memory. These innovations ensure that the models' resource consumption is reduced without sacrificing accuracy, making deploying large-scale models across a wide range of industries and use cases feasible.
+                </p>
+            </div>
+                <!-- References -->
+        <div class="mt-4">
+        <h4>References</h4>
+        <ol>
+            <li>Aggarwal, T., Salatino, A., Osborne, F., & Motta, E. (2024). Identifying Semantic Relationships Between Research Topics Using Large Language Models in a Zero-Shot Learning Setting. International Semantic Web Conference, USA 2024. Available: <a target="_blank" href="https://ceur-ws.org/Vol-3780/paper3.pdf">ceur-ws.org/Vol-3780/paper3.pdf</a></li>
+            <li>Rostam, Z. R. K., Szénási, S., & Kertész, G. (2024). Achieving Peak Performance for Large Language Models: A Systematic Review. IEEE Access. Available: <a target="_blank" href="https://arxiv.org/html/2409.04833v1">arxiv</a></li>
+            <li>H. Qin. (2023). Awesome Model Quantization Techniques. GitHub. Available: <a target="_blank" href="https://github.com/htqin/awesome-model-quantization/blob/master/README.md">GitHub</a></li>
+            <li>Zhao, X., Eyraud-Dubois, L., Le Hellard, T., Gusak, J., & Beaumont, O. (2024). OFFMATE: full fine-tuning of LLMs on a single GPU by re-materialization and offloading. Available: <a target="_blank" href="https://hal.science/hal-04660745/document">hal.science</a></li>
+        </ol>
+    </div>
+</section>
+        </div>
+
+
+
+ 
+
+
+
+
+        <!-- Citation Section -->
+        <div class="citation mt-4">
+            <h6>How to Cite Us</h6>
+            <p>If you use this calculator in your research, please cite us as follows:</p>
+            <pre>
+@misc{LLM_GpuMemory_Calculator,
+  author = {Aggarwal, Lipika and Aggarwal, Tanay},
+  title = {GPU Memory Calculator for LLMs},
+  year = {2024},
+  url = {https://lipikaaggarwal.github.io/LLM-Memory-Estimator}
+}
+            </pre>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-4">
+            <p>&copy; 2024 GPU Memory Calculator for LLMs. All rights reserved.</p>
+            <p><a target="_blank" href="https://lipikaaggarwal.github.io">Lipika Aggarwal</a></p>
+        </footer>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript to calculate GPU Memory -->
+    <script>
+        function calculateMemory() {
+            const parameters = parseFloat(document.getElementById('parameters').value) * 1e9;
+            const quantization = parseFloat(document.getElementById('quantization').value);
+            const overhead = parseFloat(document.getElementById('overhead').value);
+
+            // Formula to calculate memory
+            const memory = (parameters * 4) / (32 / quantization) * overhead;
+            const memoryInGB = memory / 1e9; // Convert to gigabytes
+
+            // Display result
+            document.getElementById('result').textContent = memoryInGB.toFixed(2);
+        }
+    </script>
+
+</body>
+</html>
