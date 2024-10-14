@@ -2,6 +2,8 @@
 
 This project provides a GPU memory calculator for large language models (LLMs). It allows users to estimate the memory requirements based on the number of parameters and quantization techniques. It explores modern memory optimization strategies, such as quantization and model sparsity, to make LLM deployment feasible on limited GPU memory.
 
+Accessible at: [lipikaaggarwal.github.io/LLM-Memory-Estimator](https://lipikaaggarwal.github.io/LLM-Memory-Estimator/)
+
 ## Features
 
 - Calculate GPU memory for LLMs using the quantization bit-width and model size.
@@ -15,7 +17,7 @@ This project provides a GPU memory calculator for large language models (LLMs). 
 2. Select the quantization bit-width (e.g., 4-bit, 8-bit, etc.).
 3. The calculator will automatically compute the GPU memory required.
 
-For a better understanding of the formula and examples, refer to the ```Formula``` and ```Example``` sections in the website.
+For a better understanding, refer to the ```Formula``` and ```Example``` sections on the [website](https://lipikaaggarwal.github.io/LLM-Memory-Estimator/).
 
 ## State-of-the-Art
 
@@ -25,7 +27,7 @@ This tool incorporates cutting-edge memory optimization techniques such as:
 - Mixed precision training
 - Memory offloading and activation recomputation
 
-For detailed descriptions, visit the **State-of-the-art** section on the website.
+For detailed descriptions, visit the ```State-of-the-art``` section on the [website](https://lipikaaggarwal.github.io/LLM-Memory-Estimator/).
 
 
 ## Citation
@@ -47,4 +49,4 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 ## Contact
 
-For any questions or suggestions, please contact us at [lipika.aggarwal@yahoo.com](lipika.aggarwal@yahoo.com) or [research@tanayaggarwal.com](research@tanayaggarwal.com)
+For any questions or suggestions, please contact us at [lipika.aggarwal@yahoo.com](mailto:lipika.aggarwal@yahoo.com) or [research@tanayaggarwal.com](mailto:research@tanayaggarwal.com)
